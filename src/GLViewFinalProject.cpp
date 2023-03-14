@@ -225,7 +225,7 @@ void Aftr::GLViewFinalProject::loadMap()
 				value = items[item_current];
 			}
 
-			//Give Relative path
+			//Give relative path (files are available in data files folder)
 
 			if (item_current == 1) {
 				ImGui::Text("Visibility Visualization");
@@ -235,7 +235,7 @@ void Aftr::GLViewFinalProject::loadMap()
 				}
 			}
 
-			//Give relative path
+			//Give relative path (files are available in data files folder)
 
 			if (item_current == 2) {
 				ImGui::Text("Temperature Visualization");
@@ -336,8 +336,12 @@ string GLViewFinalProject::openfiles(const std::string& path1, const std::string
 		cout << "Could not open the file\n";
 	}
 
-	rowsize = rowlat.size();
-	colsize = index / rowlat.size();
+	/*rowsize = rowlat.size();
+	colsize = index / rowlat.size();*/
+
+	rowsize = 1059;
+	colsize = 1799;
+
    
 	// calling the displayGrid method  
 	displayGrid(matrix);

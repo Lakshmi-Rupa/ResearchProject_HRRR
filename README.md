@@ -1,4 +1,7 @@
 # ResearchProject_HRRR
+
+Note: HRRR output files are available in data files folder. Make sure you give relative path before running the code. [lines : 230- 246]
+
 Visualization Results
 
 Case 1: Visualization for the region around the Springfield, Ohio airport
