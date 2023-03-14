@@ -214,9 +214,7 @@ void Aftr::GLViewFinalProject::loadMap()
 		{
 			ImGui::Begin("Visualization");//creates a new window 
 
-			//ImGui::Text("Enter Latitude");
 			ImGui::InputDouble("Enter Latitude", &lat, 0.0, 0.0, "%.06f", 0);
-			//ImGui::Text("Enter Longitude");
 			ImGui::InputDouble("Enter Longitude", &lon, 0.0, 0.0, "%.06f", 0);
 
 			ImGui::Text("Select Parameter");
@@ -227,19 +225,23 @@ void Aftr::GLViewFinalProject::loadMap()
 				value = items[item_current];
 			}
 
+			//Give Relative path
+
 			if (item_current == 1) {
 				ImGui::Text("Visibility Visualization");
 				if (ImGui::Button("Get Visibility (In Miles)")) {
 					temp = true;
-					paramretval = openfiles("C:/Users/msrup/latitude.csv", "C:/Users/msrup/longitude.csv", "C:/Users/msrup/vis.csv", lat, lon);
+					paramretval = openfiles("C:/Users/msrup/Lat.csv", "C:/Users/msrup/Long.csv", "C:/Users/msrup/vis_12242022_8pm.csv", lat, lon);
 				}
 			}
+
+			//Give relative path
 
 			if (item_current == 2) {
 				ImGui::Text("Temperature Visualization");
 				if (ImGui::Button("Get Temperature (In Kelvin)")) {
 					temp = true;
-					paramretval = openfiles("C:/Users/msrup/latitude.csv", "C:/Users/msrup/longitude.csv", "C:/Users/msrup/t.csv", lat, lon);
+					paramretval = openfiles("C:/Users/msrup/Lat.csv", "C:/Users/msrup/Long.csv", "C:/Users/msrup/t.csv", lat, lon);
 				}
 			}
 
@@ -268,10 +270,6 @@ void Aftr::GLViewFinalProject::loadMap()
 
 			ImGui::End(); //finalizes a window/
 
-			/*ImPlot::BeginPlot("Test");
-			ImPlot::EndPlot();*/
-			//ImPlot::PlotHeatmap();
-
 		});
 
 	this->worldLst->push_back(gui);
@@ -296,8 +294,6 @@ string GLViewFinalProject::openfiles(const std::string& path1, const std::string
 	std::ifstream fin2;
 	std::ifstream fin3;
 
-	//cout << "my values***************************************************************" << endl;
-
 	fin1.open(path1, ios::in);
 	fin2.open(path2, ios::in);
 	fin3.open(path3, ios::in);
@@ -306,11 +302,9 @@ string GLViewFinalProject::openfiles(const std::string& path1, const std::string
 	int line_count = 0;
 	if (fin1.is_open() && fin2.is_open() && fin3.is_open())
 	{
-		//cout << "my values***************************************************************8open" << endl;
 		while (getline(fin1, linelat) && getline(fin2, linelon) && getline(fin3, lineparam))
 		{
-			/*line_count++;
-			cout << "line count" << line_count << endl;*/
+			
 			rowlat.clear();
 			rowlon.clear();
 			rowparam.clear();
@@ -328,15 +322,6 @@ string GLViewFinalProject::openfiles(const std::string& path1, const std::string
 			while (getline(str3, word3, ','))
 				rowparam.push_back(word3);
 
-			//for (int i = 0; i < 20; i++)
-			//{
-			//	/*cout << row_index << " row values:" << endl;
-			//	cout << rowlat[i] << "," << rowlon[i] << "," << rowparam[i] << endl;*/
-			//	arr[row_index][0] = rowlat[i];
-			//	arr[row_index][1] = rowlon[i];
-			//	arr[row_index][2] = rowparam[i];
-			//	row_index++;
-			//}
 			
 			for (int i = 0; i < rowlat.size(); i++) {
 				matrix.push_back({ index, rowlat[i],rowlon[i], rowparam[i] });
@@ -344,28 +329,17 @@ string GLViewFinalProject::openfiles(const std::string& path1, const std::string
 			}
 			
 		}
-		/*int k = 0;
-		for (int i = 0; i < index; i++) {
-			cout << matrix[i].rowindex << "------" << matrix[i].lat1d << "------" << matrix[i].lon1d << "------" << matrix[i].param1d << endl;
-			k++;
-			cout << k << "----------count" << endl;
-		}*/
+		
 	}
 
 	else {
 		cout << "Could not open the file\n";
 	}
 
-	/*cout << rowlat.size() << "---------column size" << endl;
-	cout << index << "---------row size" << endl;*/
-
-	/*rowsize = rowlat.size();
-	colsize = index / rowlat.size();*/
-
-	rowsize = 1059;
-	colsize = 1799;
-
-
+	rowsize = rowlat.size();
+	colsize = index / rowlat.size();
+   
+	// calling the displayGrid method  
 	displayGrid(matrix);
 
 	double mindis = 2147483647;
@@ -404,11 +378,8 @@ string GLViewFinalProject::openfiles(const std::string& path1, const std::string
 			lonfin = matrix[z].lon1d;
 			latfin = matrix[z].lat1d;
 
-			/*cout << distance << endl;
-			cout << latfin << " " << lonfin << " " << nearestparam << endl;*/
 		}
 	}
-	//cout << latfin << " " << lonfin << " " << nearestparam << " ********************" << endl;
 
 	if (flag == 0) {
 		return nearestparam;
@@ -419,16 +390,13 @@ string GLViewFinalProject::openfiles(const std::string& path1, const std::string
 }
 
 void GLViewFinalProject::displayGrid(vector<onedvals> matrix) {
-	/*for (int z = 0; z < 400; z++) {
-		cout << arr[z][0] << "," << arr[z][1] << "," << arr[z][2] << endl;
-	}*/
-
 	std::vector<std::vector<Aftr::VectorD>> gridpt;
 	std::vector<std::vector<Aftr::aftrColor4ub>> color;
 
 	gridpt.clear();
 	color.clear();
 
+	// calculate min and max values for the output data 
 	double minpv = minParamValue(matrix);
 	double maxpv = maxParamValue(matrix);
 
@@ -443,10 +411,8 @@ void GLViewFinalProject::displayGrid(vector<onedvals> matrix) {
 		color[i].resize(colsize);
 
 		for (int j = 0; j < colsize; ++j) {
-			//cout << matrix[z].param1d << endl;
 			gridpt[i][j] = VectorD(i, j, stod(matrix[z].param1d));
 			z++;
-			//cout << gridpt[i][j].z << endl;
 			double c = gridpt[i][j].z;
 			float value = 0;
 			if (c < minpv) {
@@ -462,6 +428,8 @@ void GLViewFinalProject::displayGrid(vector<onedvals> matrix) {
 			color[i][j] = AftrUtilities::convertHSVtoRGB(hsv);
 		}
 	}
+
+	// Creating a WOGrid with parameter value as height points (z axis) lat and lon as x and y axis
 
 	WOGrid* heightField = WOGrid::New(gridpt, Vector(1, 1, 1), color);
 
@@ -506,6 +474,8 @@ double GLViewFinalProject::maxParamValue(std::vector<onedvals> matrix) {
 	return maxval;
 }
 
+
+// deletes the world list
 void GLViewFinalProject::deleteGrid() {
 	if (worldLst->size() > 2) {
 		worldLst->eraseViaWOIndex(worldLst->size() - 1);
